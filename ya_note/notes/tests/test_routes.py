@@ -49,6 +49,7 @@ class TestRoutes(TestCase):
                 url = reverse(name, args=args)
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
+
     def test_redirect_anonymous_client(self):
         """Проверка перенаправление незалогиненного пользователя."""
         login_url = reverse('users:login')
