@@ -22,6 +22,7 @@ def test_news_order(client, news_10):
     sorted_dates = sorted(all_dates, reverse=True)
     assert all_dates == sorted_dates
 
+
 def test_comments_order(client, news, commets):
     """Проверка работы сортировки комментариев."""
     url = reverse('news:detail', args=(news.id,))
@@ -33,13 +34,14 @@ def test_comments_order(client, news, commets):
     sorted_date = sorted(all_date_created)
     assert all_date_created == sorted_date
 
+
 def test_detail_page_contains_form(author_client, news, form_data):
     """Проверка наличия формы комментариев для авторизованного автора."""
     url = reverse('news:detail', args=(news.id,))
     response = author_client.get(url, data=form_data)
     form = response.context['form']
     assert 'form' in response.context
-    assert isinstance(response.context['form'], CommentForm) 
+    assert isinstance(form, CommentForm)
 
 
 def test_detail_page_contains_form_user(client, news):
@@ -47,4 +49,3 @@ def test_detail_page_contains_form_user(client, news):
     url = reverse('news:detail', args=(news.id,))
     response = client.get(url)
     assert 'form' not in response.context
-

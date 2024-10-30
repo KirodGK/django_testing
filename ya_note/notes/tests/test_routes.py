@@ -80,4 +80,3 @@ class TestRoutes(TestCase):
                     url = reverse(name, args=(self.notes.slug,))
                     response = self.client.get(url)
                     self.assertEqual(response.status_code, status)
-
