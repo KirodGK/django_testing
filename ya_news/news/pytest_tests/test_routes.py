@@ -5,7 +5,8 @@ from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
 from news.models import News
-    
+
+
 @pytest.mark.parametrize(
     'name, args',
     (
@@ -16,7 +17,8 @@ from news.models import News
         ('news:detail', pytest.lazy_fixture('id_news_for_args')),
     ),
 )
-def test_pages_availability_for_anonymous_user(client, name, args, news):
+def test_pages_availability_anonymous_user(client, name, args, news):
+    """Доступность страниц для пользователя."""
     url = reverse(name, args=args)
     response = client.get(url)
     assert response.status_code == HTTPStatus.OK
@@ -26,7 +28,8 @@ def test_pages_availability_for_anonymous_user(client, name, args, news):
     'name',
     ('news:delete', 'news:edit'),
 )
-def test_pages_availability_for_author(author_client, name, comment):
+def test_pages_availability_author(author_client, name, comment):
+    """Доступность страниц удаления и редактирования  для автора."""
     url = reverse(name, args=(comment.id,))
     response = author_client.get(url)
     assert response.status_code == HTTPStatus.OK
@@ -35,7 +38,7 @@ def test_pages_availability_for_author(author_client, name, comment):
 @pytest.mark.parametrize(
     'parametrized_client, expected_status',
     (
-        (pytest.lazy_fixture('admin_client'), HTTPStatus.NOT_FOUND),
+        (pytest.lazy_fixture('client'), HTTPStatus.NOT_FOUND),
         (pytest.lazy_fixture('author_client'), HTTPStatus.OK)
     ),
 )
@@ -43,9 +46,10 @@ def test_pages_availability_for_author(author_client, name, comment):
     'name',
     ('news:delete', 'news:edit'),
 )
-def test_pages_availability_for_different_users(
+def test_pages_availability_different_users(
         parametrized_client, name, comment, expected_status
 ):
+    """Доступность страниц удаления и редактирования для пользователей."""
     url = reverse(name, args=(comment.id,))
     response = parametrized_client.get(url)
     assert response.status_code == expected_status
@@ -59,6 +63,8 @@ def test_pages_availability_for_different_users(
     ),
 )
 def test_redirects(client, name, args):
+    """Перенаправлние при запросе страниц удаления и редактирования записей\
+        другого автора."""
     login_url = reverse('users:login')
     url = reverse(name, args=args)
     expected_url = f'{login_url}?next={url}'
