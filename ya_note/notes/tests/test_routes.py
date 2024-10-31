@@ -1,26 +1,24 @@
 from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
 from django.urls import reverse
 
-from notes.models import Note
-
+from .test_fixture import TestFixture
 
 User = get_user_model()
 
 
-class TestRoutes(TestCase):
+class TestRoutes(TestFixture):
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.author = User.objects.create(username='Лев Толстой')
-        cls.reader = User.objects.create(username='Читатель простой')
-        cls.notes = Note.objects.create(
-            title='Заголовок',
-            text='Текст',
-            author=cls.author
-        )
+    # @classmethod
+    # def setUpTestData(cls):
+    #     cls.author = User.objects.create(username='Лев Толстой')
+    #     cls.reader = User.objects.create(username='Читатель простой')
+    #     cls.notes = Note.objects.create(
+    #         title='Заголовок',
+    #         text='Текст',
+    #         author=cls.author
+    #     )
 
     def test_pages_availability(self):
         """Проверка доступности страниц для всех пользователей."""
@@ -44,10 +42,10 @@ class TestRoutes(TestCase):
             ('notes:add', None),
         )
         for name, args in urls:
-            self.client.force_login(self.author)
+            
             with self.subTest(name=name):
                 url = reverse(name, args=args)
-                response = self.client.get(url)
+                response = self.login_author.get(url)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_redirect_anonymous_client(self):
@@ -71,11 +69,11 @@ class TestRoutes(TestCase):
     def test_availability_edit_delite_detail(self):
         """Проверка доступности страниц только автору."""
         users_statuses = (
-            (self.author, HTTPStatus.OK),
-            (self.reader, HTTPStatus.NOT_FOUND),
+            (self.login_author, HTTPStatus.OK),
+            (self.login_reader, HTTPStatus.NOT_FOUND),
         )
         for user, status in users_statuses:
-            self.client.force_login(user)
+            self.client = user
             for name in ('notes:edit', 'notes:delete', 'notes:detail'):
                 with self.subTest(user=user, name=name):
                     url = reverse(name, args=(self.notes.slug,))
