@@ -45,7 +45,7 @@ def test_redirects(reverse_url, parametrized_client, status):
 
 @pytest.mark.parametrize(
     'urls',
-    ( 
+    (
         pytest.lazy_fixture('delete'),
         pytest.lazy_fixture('edit'),
     ),
