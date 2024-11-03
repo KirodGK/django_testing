@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.urls import reverse, reverse_lazy
@@ -49,11 +49,14 @@ def news(author):
 
 
 @pytest.fixture
-def news_10(author):
+def news_list_generate(author):
     """Фикстура создание записей больше чем паддинг."""
     all_news = []
+    today = datetime.today()
+
     for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1):
-        news = News(title=f'Новость {index}', text='Просто текст.')
+        news = News(title=f'Новость {index}', text='Просто текст.',
+                    date=today - timedelta(days=index))
         all_news.append(news)
     return News.objects.bulk_create(all_news)
 
@@ -81,50 +84,45 @@ def commets(author, news):
         )
         comment.created = timezone.now() + timedelta(days=index)
         comment.save()
-        all_comments.append(comment)
-    return all_comments
 
-
-@pytest.fixture
-def id_news_for_args(news):
-    """Фикстура номера записи."""
-    return news.id
-
-@pytest.fixture
-def id_comment_for_args(comment):
-    """Фикстура номера комментария."""
-    return comment.id
-
-
-@pytest.fixture
-def form_data():
-    """Фикстура текста."""
-    return {
-        'text': 'Новый техт'
-    }
 
 @pytest.fixture
 def home():
+    """Фикстура url home."""
     return reverse('news:home', None)
+
+
 @pytest.fixture
 def login():
+    """Фикстура url login."""
     return reverse('users:login', None)
-    
+
+
 @pytest.fixture
 def logout():
+    """Фикстура url logout."""
     return reverse('users:logout', None)
+
 
 @pytest.fixture
 def signup():
+    """Фикстура url signup."""
     return reverse('users:signup', None)
 
-@pytest.fixture
-def detail(id_news_for_args):
-    return reverse('news:detail',  args=[id_news_for_args])
 
 @pytest.fixture
-def delete(id_comment_for_args):
-    return reverse('news:delete',  args=[id_comment_for_args])
+def detail(news):
+    """Фикстура url detail."""
+    return reverse('news:detail',  args=[news.id])
+
+
 @pytest.fixture
-def edit(id_comment_for_args):
-    return reverse('news:edit',  args=[id_comment_for_args])
+def delete(comment):
+    """Фикстура url delete."""
+    return reverse('news:delete',  args=[comment.id])
+
+
+@pytest.fixture
+def edit(comment):
+    """Фикстура url edit."""
+    return reverse('news:edit',  args=[comment.id])
