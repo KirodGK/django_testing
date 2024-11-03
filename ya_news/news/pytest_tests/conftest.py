@@ -26,7 +26,7 @@ def reader_client(reader):
 
 @pytest.fixture
 def author(django_user_model):
-    """Фикстура Автора"""
+    """Фикстура Автора."""
     return django_user_model.objects.create(username='Автор')
 
 

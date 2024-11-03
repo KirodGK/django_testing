@@ -15,7 +15,6 @@ import pytest
     pytest.lazy_fixture('detail'),
     )
 )
-
 def test_pages_availability_anonymous_user(client, test_url, news):
     """Доступность страниц для пользователя."""
     url = test_url
@@ -33,7 +32,7 @@ def test_pages_availability_anonymous_user(client, test_url, news):
     )
 )
 def test_redirects(reverse_url, parametrized_client, status):
-    login_url = reverse('users:login')
+    """Доступность страниц удаления и редактирования."""
     url = reverse_url
     response = parametrized_client.get(url)
     assert response.status_code == status

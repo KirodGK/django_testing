@@ -5,6 +5,7 @@ from news.forms import CommentForm
 
 from .const import FORM_DATA
 
+
 def test_home_page(client, home, news_list_generate):
     """Проверка работы пагинации."""
     response = client.get(home)

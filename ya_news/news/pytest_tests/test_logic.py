@@ -7,20 +7,20 @@ from django.urls import reverse
 from news.models import Comment
 from news.forms import BAD_WORDS, WARNING
 
-from .const import FORM_DATA 
+from .const import FORM_DATA
 
-def test_user_create_comment(author_client, detail, author , news,
+def test_user_create_comment(author_client, detail, author, news,
                              comment):
     """Создание комментария авторизованный автором."""
     comments_count = Comment.objects.count()
     url = detail
-    response = author_client.post(url, data=FORM_DATA )
+    response = author_client.post(url, data=FORM_DATA)
     assertRedirects(response, f'{url}#comments')
     assert Comment.objects.count() == comments_count+1
     comments_count_last = Comment.objects.count()
     new_comment = Comment.objects.get(id=comments_count_last)
     print(new_comment.created)
-    assert new_comment.text == FORM_DATA ['text']
+    assert new_comment.text == FORM_DATA['text']
     assert new_comment.author == author
     assert new_comment.news == news
 
@@ -29,7 +29,7 @@ def test_anonymous_user_create_news(client, news):
     """Создание записи неавторизованный пользователем."""
     comments_count = Comment.objects.count()
     url = reverse('news:detail', args=(news.id,))
-    response = client.post(url, data=FORM_DATA )
+    response = client.post(url, data=FORM_DATA)
     login_url = reverse('users:login')
     expected_url = f'{login_url}?next={url}'
     assertRedirects(response, expected_url)
