@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from django.conf import settings
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils import timezone
 from django.test import Client
 
@@ -75,7 +75,6 @@ def comment(author, news):
 @pytest.fixture
 def commets(author, news):
     """Фикстура создания нескольких комментариев."""
-    all_comments = []
     for index in range(2):
         comment = Comment.objects.create(
             news=news,
@@ -113,16 +112,16 @@ def signup():
 @pytest.fixture
 def detail(news):
     """Фикстура url detail."""
-    return reverse('news:detail',  args=[news.id])
+    return reverse('news:detail', args=[news.id])
 
 
 @pytest.fixture
 def delete(comment):
     """Фикстура url delete."""
-    return reverse('news:delete',  args=[comment.id])
+    return reverse('news:delete', args=[comment.id])
 
 
 @pytest.fixture
 def edit(comment):
     """Фикстура url edit."""
-    return reverse('news:edit',  args=[comment.id])
+    return reverse('news:edit', args=[comment.id])

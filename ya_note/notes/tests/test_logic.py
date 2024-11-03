@@ -6,11 +6,11 @@ from django.test import Client
 from .test_fixture import TestFixture
 from ..models import Note
 from ..forms import NoteForm
+
 User = get_user_model()
 
 
 class TestnotesCreation(TestFixture):
-
 
     def test_anonymous_user_cant_create_notes(self):
         """Проверка создания заметки незалогиненного пользователя."""
@@ -24,7 +24,7 @@ class TestnotesCreation(TestFixture):
         notes_count_main = Note.objects.count()
         self.login_author.post(self.url, data=self.form_data)
         notes_count = Note.objects.count()
-        self.assertEqual(notes_count, notes_count_main+1)
+        self.assertEqual(notes_count, notes_count_main + 1)
         notes = Note.objects.get(id=notes_count)
         self.assertEqual(notes.text, self.form_data.get("text"))
         self.assertEqual(notes.title, self.form_data.get("title"))
@@ -40,7 +40,7 @@ class TestnotesCreation(TestFixture):
         response = self.login_author.post(self.url, data=self.form_data)
         notes_count_2 = Note.objects.count()
         self.assertEqual(notes_count_2, notes_count_main)
-        self.assertFormError(response, 'form', 'slug',  f'slug{self.warning}')
+        self.assertFormError(response, 'form', 'slug', f'slug{self.warning}')
 
     def test_auto_creation_slug(self):
         """функция автоматической генерации slug."""
@@ -61,7 +61,7 @@ class TestnotesEditDelete(TestFixture):
         response = self.login_author.delete(self.delete_url)
         self.assertRedirects(response, self.note_url)
         notes_count = Note.objects.count()
-        self.assertEqual(notes_count, (notes_count_main-1))
+        self.assertEqual(notes_count, (notes_count_main - 1))
 
     def test_user_cant_delete_notes_of_another_user(self):
         """Запрет удаления заметки другого пользователя."""

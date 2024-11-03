@@ -14,7 +14,6 @@ class TestNotesPage(TestFixture):
 
     def test_notes_list(self):
         """Наличие заметок в спике вывода"""
-        
         response = self.login_author.get(self.NOTES_URL)
         object_list_main = response.context['object_list']
         self.notes = Note.objects.create(
@@ -27,20 +26,16 @@ class TestNotesPage(TestFixture):
 
     def test_reader_context_list(self):
         """Наличие заметок другого автора"""
-
         response = self.login_reader.get(self.NOTES_URL)
         object_list = response.context['object_list']
         notes_author = self.author
         self.assertNotIn(notes_author, object_list)
-        
-
 
 
 class TestAddAndEditPage(TestFixture):
 
     def test_form(self):
         """Доступность форм редактирования и добавления заметок."""
-        
         urls = (self.edit, self.add)
         for name, args in urls:
             with self.subTest(name=name):

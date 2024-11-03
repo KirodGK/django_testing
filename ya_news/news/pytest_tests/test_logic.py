@@ -9,6 +9,7 @@ from news.forms import BAD_WORDS, WARNING
 
 from .const import FORM_DATA
 
+
 def test_user_create_comment(author_client, detail, author, news,
                              comment):
     """Создание комментария авторизованный автором."""
@@ -16,7 +17,7 @@ def test_user_create_comment(author_client, detail, author, news,
     url = detail
     response = author_client.post(url, data=FORM_DATA)
     assertRedirects(response, f'{url}#comments')
-    assert Comment.objects.count() == comments_count+1
+    assert Comment.objects.count() == comments_count + 1
     comments_count_last = Comment.objects.count()
     new_comment = Comment.objects.get(id=comments_count_last)
     print(new_comment.created)
@@ -45,7 +46,6 @@ def test_user_used_bad_words(author_client, news):
     response = author_client.post(url, data=data_bad_words)
     assert Comment.objects.count() == comments_count
     assertFormError(response, 'form', 'text', errors=(WARNING))
-    
 
 
 def test_author_delete_comment(author_client, news, comment):

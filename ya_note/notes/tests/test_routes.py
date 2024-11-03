@@ -27,7 +27,6 @@ class TestRoutes(TestFixture):
             self.list, self.success, self.add,
         )
         for name, args in urls:
-            
             with self.subTest(name=name):
                 url = reverse(name, args=args)
                 response = self.login_author.get(url)

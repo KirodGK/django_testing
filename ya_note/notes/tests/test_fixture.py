@@ -7,8 +7,9 @@ from notes.models import Note
 
 User = get_user_model()
 
+
 class TestFixture(TestCase):
-    
+
     @classmethod
     def setUpTestData(cls):
         cls.author = User.objects.create(username='Лев Толстой')
@@ -78,17 +79,10 @@ class TestFixture(TestCase):
         cls.signup = (
             'users:signup', None
         )
-        
+
         cls.url = reverse('notes:add', args=None)
         cls.note_url = reverse('notes:success', args=None)
         cls.edit_url = reverse('notes:edit', args=(cls.notes.slug,))
-        cls.delete_url = reverse('notes:delete',  args=(cls.notes.slug,))
-        cls.warning = ' - такой slug уже существует, придумайте уникальное значение!'
-        
-    
-        #  urls = (
-        #     ('notes:home', None),
-        #     ('users:login', None),
-        #     ('users:logout', None),
-        #     ('users:signup', None),
-        # )
+        cls.delete_url = reverse('notes:delete', args=(cls.notes.slug,))
+        cls.warning = ' - такой slug уже существует, придумайте уникальное\
+            значение!'
