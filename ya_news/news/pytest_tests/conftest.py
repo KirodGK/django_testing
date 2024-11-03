@@ -1,9 +1,13 @@
-import pytest
 from datetime import timedelta
 
-from news.models import News, Comment
 from django.conf import settings
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.test import Client
+
+import pytest
+
+from news.models import News, Comment
 
 
 @pytest.fixture
@@ -13,8 +17,9 @@ def reader(django_user_model):
 
 
 @pytest.fixture
-def reader_client(reader, client):
+def reader_client(reader):
     """Фикстура авторизованного Читателя."""
+    client = Client()
     client.force_login(reader)
     return client
 
@@ -26,8 +31,9 @@ def author(django_user_model):
 
 
 @pytest.fixture
-def author_client(author, client):
+def author_client(author):
     """Фикстура авторизованного Автора."""
+    client = Client()
     client.force_login(author)
     return client
 
@@ -82,13 +88,12 @@ def commets(author, news):
 @pytest.fixture
 def id_news_for_args(news):
     """Фикстура номера записи."""
-    return news.id,
-
+    return news.id
 
 @pytest.fixture
 def id_comment_for_args(comment):
     """Фикстура номера комментария."""
-    return comment.id,
+    return comment.id
 
 
 @pytest.fixture
@@ -97,3 +102,29 @@ def form_data():
     return {
         'text': 'Новый техт'
     }
+
+@pytest.fixture
+def home():
+    return reverse('news:home', None)
+@pytest.fixture
+def login():
+    return reverse('users:login', None)
+    
+@pytest.fixture
+def logout():
+    return reverse('users:logout', None)
+
+@pytest.fixture
+def signup():
+    return reverse('users:signup', None)
+
+@pytest.fixture
+def detail(id_news_for_args):
+    return reverse('news:detail',  args=[id_news_for_args])
+
+@pytest.fixture
+def delete(id_comment_for_args):
+    return reverse('news:delete',  args=[id_comment_for_args])
+@pytest.fixture
+def edit(id_comment_for_args):
+    return reverse('news:edit',  args=[id_comment_for_args])

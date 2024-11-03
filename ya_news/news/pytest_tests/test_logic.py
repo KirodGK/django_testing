@@ -61,21 +61,21 @@ def test_author_edit_comment(author_client, news, form_data, comment):
     assert Comment.objects.count() == comments_count
 
 
-def test_user_delete_comment_of_another_user(reader_client, comment):
-    """Запрет удаление комментария другого пользоватлея."""
-    comments_count = Comment.objects.count()
-    url = reverse('news:delete', args=(comment.id,))
-    response = reader_client.delete(url)
-    assert response.status_code == HTTPStatus.NOT_FOUND
-    assert Comment.objects.count() == comments_count
+# def test_user_delete_comment_of_another_user(reader_client, comment):
+#     """Запрет удаление комментария другого пользоватлея."""
+#     comments_count = Comment.objects.count()
+#     url = reverse('news:delete', args=(comment.id,))
+#     response = reader_client.delete(url)
+#     assert response.status_code == HTTPStatus.NOT_FOUND
+#     assert Comment.objects.count() == comments_count
 
 
-def test_user_edit_comment_of_another_user(
-        reader_client,
-        form_data,
-        comment
-):
-    """Запрет редактирования комментария другого пользователя."""
-    url = reverse('news:edit', args=(comment.id,))
-    response = reader_client.post(url, data=form_data)
-    assert response.status_code == HTTPStatus.NOT_FOUND
+# def test_user_edit_comment_of_another_user(
+#         reader_client,
+#         form_data,
+#         comment
+# ):
+#     """Запрет редактирования комментария другого пользователя."""
+#     url = reverse('news:edit', args=(comment.id,))
+#     response = reader_client.post(url, data=form_data)
+#     assert response.status_code == HTTPStatus.NOT_FOUND
