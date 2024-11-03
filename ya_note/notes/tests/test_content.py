@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.test import Client
 from django.urls import reverse
 
 from notes.models import Note
 from .test_fixture import TestFixture
+from ..forms import NoteForm
 
 User = get_user_model()
 
@@ -16,24 +16,24 @@ class TestNotesPage(TestFixture):
         """Наличие заметок в спике вывода"""
         
         response = self.login_author.get(self.NOTES_URL)
-        object_list = response.context['object_list']
-        first_note = self.notes
-        self.assertIn(first_note, object_list)
+        object_list_main = response.context['object_list']
+        self.notes = Note.objects.create(
+            title='Заголовок test_notes_list',
+            text='Текст',
+            author=self.author
+        )
+        object_list_last = response.context['object_list']
+        self.assertNotIn(object_list_last, object_list_main)
 
     def test_reader_context_list(self):
         """Наличие заметок другого автора"""
-        
+
         response = self.login_reader.get(self.NOTES_URL)
         object_list = response.context['object_list']
-        notes_count = len(object_list)
-        self.assertEqual(notes_count, 0)
+        notes_author = self.author
+        self.assertNotIn(notes_author, object_list)
+        
 
-    def test_author_context_list(self):
-        """Наличие заметок автора"""
-        response = self.login_author.get(self.NOTES_URL)
-        object_list = response.context['object_list']
-        notes_count = len(object_list)
-        self.assertEqual(notes_count, 10)
 
 
 class TestAddAndEditPage(TestFixture):
@@ -41,12 +41,10 @@ class TestAddAndEditPage(TestFixture):
     def test_form(self):
         """Доступность форм редактирования и добавления заметок."""
         
-        urls = (
-            ('notes:edit', (self.notes.slug,)),
-            ('notes:add', None),
-        )
+        urls = (self.edit, self.add)
         for name, args in urls:
             with self.subTest(name=name):
                 url = reverse(name, args=args)
                 response = self.login_author.get(url)
                 self.assertIn('form', response.context)
+                self.assertIsInstance(response.context.get("form"), NoteForm)

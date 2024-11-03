@@ -10,23 +10,10 @@ User = get_user_model()
 
 class TestRoutes(TestFixture):
 
-    # @classmethod
-    # def setUpTestData(cls):
-    #     cls.author = User.objects.create(username='Лев Толстой')
-    #     cls.reader = User.objects.create(username='Читатель простой')
-    #     cls.notes = Note.objects.create(
-    #         title='Заголовок',
-    #         text='Текст',
-    #         author=cls.author
-    #     )
-
     def test_pages_availability(self):
         """Проверка доступности страниц для всех пользователей."""
         urls = (
-            ('notes:home', None),
-            ('users:login', None),
-            ('users:logout', None),
-            ('users:signup', None),
+            self.home, self.login, self.logout, self.signup
         )
         for name, args in urls:
             with self.subTest(name=name):
@@ -37,9 +24,7 @@ class TestRoutes(TestFixture):
     def page_available_authorized_user(self):
         """Проверка доступности страниц для залогиненного пользователя."""
         urls = (
-            ('notes:list', None),
-            ('notes:success', None),
-            ('notes:add', None),
+            self.list, self.success, self.add,
         )
         for name, args in urls:
             
@@ -52,12 +37,9 @@ class TestRoutes(TestFixture):
         """Проверка перенаправление незалогиненного пользователя."""
         login_url = reverse('users:login')
         urls = (
-            ('notes:edit', (self.notes.slug,)),
-            ('notes:delete', (self.notes.slug,)),
-            ('notes:detail', (self.notes.slug,)),
-            ('notes:list', None),
-            ('notes:success', None),
-            ('notes:add', None),
+            self.edit, self.delete, ('notes:detail', (self.notes.slug,)),
+            self.list, self.success,
+            self.add
         )
         for name, args in urls:
             with self.subTest(name=name):
@@ -74,8 +56,8 @@ class TestRoutes(TestFixture):
         )
         for user, status in users_statuses:
             self.client = user
-            for name in ('notes:edit', 'notes:delete', 'notes:detail'):
+            for name, item in (self.edit, self.delete, self.detail):
                 with self.subTest(user=user, name=name):
-                    url = reverse(name, args=(self.notes.slug,))
+                    url = reverse(name, args=item)
                     response = self.client.get(url)
                     self.assertEqual(response.status_code, status)
