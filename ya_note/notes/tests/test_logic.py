@@ -2,10 +2,8 @@ from http import HTTPStatus
 from pytils.translit import slugify
 
 from django.contrib.auth import get_user_model
-from django.test import Client
 from .test_fixture import TestFixture
 from ..models import Note
-from ..forms import NoteForm
 
 User = get_user_model()
 
