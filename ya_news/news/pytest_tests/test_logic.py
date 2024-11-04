@@ -1,11 +1,10 @@
 from http import HTTPStatus
 
-from django.urls import reverse
 from pytest_django.asserts import assertFormError, assertRedirects
 
 from news.forms import BAD_WORDS, WARNING
-from news.models import Comment 
-from .const import FORM_DATA  
+from news.models import Comment
+from .const import FORM_DATA
 
 
 def test_user_create_comment(author_client, detail, author, news,
