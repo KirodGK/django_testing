@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.urls import reverse
 
 from notes.models import Note
 from .test_fixture import TestFixture
@@ -29,7 +28,7 @@ class TestAddAndEditPage(TestFixture):
 
     def test_form(self):
         """Доступность форм редактирования и добавления заметок."""
-        urls = (self.url,  self.edit_url)
+        urls = (self.url, self.edit_url)
         for url in urls:
             with self.subTest(url=url):
                 response = self.login_author.get(url)

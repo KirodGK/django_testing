@@ -32,12 +32,8 @@ class TestRoutes(TestFixture):
 
     def test_redirect_anonymous_client(self):
         """Проверка перенаправление незалогиненного пользователя."""
-        
-        urls = (
-            self.edit, self.delete, self.detail,
-            self.list, self.success,
-            self.add
-        )
+        urls = (self.edit, self.delete, self.detail, self.list, self.success,
+                self.add)
         for name, args in urls:
             with self.subTest(name=name):
                 url = reverse(name, args=args)
