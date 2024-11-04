@@ -1,42 +1,28 @@
 from http import HTTPStatus
 
+import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
+from pytest_lazyfixture import lazy_fixture as lf
 
-import pytest
-
-
-@pytest.mark.parametrize(
-    "test_url", (
-        pytest.lazy_fixture('home'),
-        pytest.lazy_fixture('login'),
-        pytest.lazy_fixture('logout'),
-        pytest.lazy_fixture('signup'),
-        pytest.lazy_fixture('detail'),
-    )
-)
-def test_pages_availability_anonymous_user(client, test_url, news):
-    """Доступность страниц для пользователя."""
-    url = test_url
-    response = client.get(url)
-    print(client)
-    assert response.status_code == HTTPStatus.OK
+from .const import  NOT_FOUND, SUCCESSFULLY_COMPLETED
 
 
 @pytest.mark.parametrize(
     'reverse_url, parametrized_client, status',
     (
-        (pytest.lazy_fixture('delete'), pytest.lazy_fixture('author_client'),
-         HTTPStatus.OK),
-        (pytest.lazy_fixture('edit'), pytest.lazy_fixture('author_client'),
-         HTTPStatus.OK),
-        (pytest.lazy_fixture('delete'), pytest.lazy_fixture('admin_client'),
-         HTTPStatus.NOT_FOUND),
-        (pytest.lazy_fixture('edit'), pytest.lazy_fixture('admin_client'),
-         HTTPStatus.NOT_FOUND),
+        (lf('delete'), lf('author_client'), SUCCESSFULLY_COMPLETED),
+        (lf('edit'), lf('author_client'), SUCCESSFULLY_COMPLETED),
+        (lf('delete'), lf('admin_client'), NOT_FOUND),
+        (lf('edit'), lf('admin_client'), NOT_FOUND),
+        (lf('home'), lf('admin_client'), SUCCESSFULLY_COMPLETED),
+        (lf('login'), lf('admin_client'), SUCCESSFULLY_COMPLETED),
+        (lf('logout'), lf('admin_client'), SUCCESSFULLY_COMPLETED),
+        (lf('signup'), lf('admin_client'), SUCCESSFULLY_COMPLETED),
+        (lf('detail'), lf('admin_client'), SUCCESSFULLY_COMPLETED),
     )
 )
-def test_redirects(reverse_url, parametrized_client, status):
+def test_redirects_all(reverse_url, parametrized_client, status):
     """Доступность страниц удаления и редактирования."""
     url = reverse_url
     response = parametrized_client.get(url)
@@ -46,14 +32,13 @@ def test_redirects(reverse_url, parametrized_client, status):
 @pytest.mark.parametrize(
     'urls',
     (
-        pytest.lazy_fixture('delete'),
-        pytest.lazy_fixture('edit'),
+        lf('delete'),
+        lf('edit'),
     ),
 )
-def test_redirects(client, urls):
+def test_redirects(client, urls, login):
     """Перенаправлние при запросе страниц удаления и редактирования записей\
         другого автора."""
-    login_url = reverse('users:login')
-    expected_url = f'{login_url}?next={urls}'
+    expected_url = f'{login}?next={urls}'
     response = client.get(urls)
     assertRedirects(response, expected_url)

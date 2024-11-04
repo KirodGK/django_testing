@@ -4,10 +4,9 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 from django.test import Client
-
 import pytest
 
-from news.models import News, Comment
+from news.models import Comment, News
 
 
 @pytest.fixture
@@ -51,14 +50,10 @@ def news(author):
 @pytest.fixture
 def news_list_generate(author):
     """Фикстура создание записей больше чем паддинг."""
-    all_news = []
     today = datetime.today()
-
     for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1):
-        news = News(title=f'Новость {index}', text='Просто текст.',
-                    date=today - timedelta(days=index))
-        all_news.append(news)
-    return News.objects.bulk_create(all_news)
+        News.objects.create(title=f'Новость {index}', text='Просто текст.',
+                            date=today - timedelta(days=index))
 
 
 @pytest.fixture
@@ -88,31 +83,37 @@ def commets(author, news):
 @pytest.fixture
 def home():
     """Фикстура url home."""
-    return reverse('news:home', None)
+    return reverse('news:home')
 
 
 @pytest.fixture
 def login():
     """Фикстура url login."""
-    return reverse('users:login', None)
+    return reverse('users:login')
 
 
 @pytest.fixture
 def logout():
     """Фикстура url logout."""
-    return reverse('users:logout', None)
+    return reverse('users:logout')
 
 
 @pytest.fixture
 def signup():
     """Фикстура url signup."""
-    return reverse('users:signup', None)
+    return reverse('users:signup')
 
 
 @pytest.fixture
 def detail(news):
     """Фикстура url detail."""
     return reverse('news:detail', args=[news.id])
+
+
+@pytest.fixture
+def detail_comment(detail):
+    """Фикстура url detail_comment."""
+    return detail + '#comments'
 
 
 @pytest.fixture
