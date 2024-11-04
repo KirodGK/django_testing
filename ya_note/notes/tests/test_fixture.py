@@ -5,9 +5,10 @@ from django.test import Client, TestCase
 
 from notes.models import Note
 
+from .const import WARNING
+
 User = get_user_model()
 
-from .const import WARNING
 
 class TestFixture(TestCase):
 
