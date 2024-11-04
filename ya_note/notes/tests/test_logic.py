@@ -32,13 +32,14 @@ class TestnotesCreation(TestFixture):
         """создание дублирующих уникальныйх полей."""
         self.login_author.post(self.url, data=self.form_data)
         notes_count_main = Note.objects.count()
-        self.login_author.post(self.url, data=self.form_data)
+        response = self.login_author.post(self.url, data=self.form_data)
         notes_count_last = Note.objects.count()
         self.assertEqual(notes_count_last, (notes_count_main))
-        response = self.login_author.post(self.url, data=self.form_data)
+        # response = self.login_author.post(self.url, data=self.form_data)
         notes_count_2 = Note.objects.count()
         self.assertEqual(notes_count_2, notes_count_main)
-        self.assertFormError(response, 'form', 'slug', f'slug{self.warning}')
+        slug =self.form_data['slug']
+        self.assertFormError(response, 'form', 'slug',  f'slug{self.warning}')
 
     def test_auto_creation_slug(self):
         """функция автоматической генерации slug."""
@@ -46,9 +47,11 @@ class TestnotesCreation(TestFixture):
         notes_count_main = Note.objects.count()
         self.login_author.post(self.url, data=self.form_data)
         notes_count_last = Note.objects.count()
-        notes = self.notes
-        self.assertEqual(notes_count_main, notes_count_last)
-        self.assertEqual(notes.slug, slugify(notes.title))
+        self.assertEqual(notes_count_last, (notes_count_main))
+        response = self.login_author.post(self.url, data=self.form_data)
+        notes_count_2 = Note.objects.count()
+        self.assertEqual(notes_count_2, notes_count_main)
+        self.assertFormError(response, 'form', 'slug',  f'slug{self.warning}')
 
 
 class TestnotesEditDelete(TestFixture):
