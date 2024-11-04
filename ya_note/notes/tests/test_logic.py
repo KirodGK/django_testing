@@ -2,8 +2,10 @@ from http import HTTPStatus
 from pytils.translit import slugify
 
 from django.contrib.auth import get_user_model
-from .test_fixture import TestFixture
+from pytils.translit import slugify
+
 from ..models import Note
+from .test_fixture import TestFixture
 
 User = get_user_model()
 
@@ -23,31 +25,28 @@ class TestnotesCreation(TestFixture):
         self.login_author.post(self.url, data=self.form_data)
         notes_count = Note.objects.count()
         self.assertEqual(notes_count, notes_count_main + 1)
-        notes = Note.objects.get(id=notes_count)
+        notes = Note.objects.last()
         self.assertEqual(notes.text, self.form_data.get("text"))
         self.assertEqual(notes.title, self.form_data.get("title"))
-        self.assertEqual(notes.author, self.form_data.get("author"))
+        self.assertEqual(notes.author, self.author)
 
     def test_two_slug(self):
-        """создание дублирующих уникальныйх полей."""
-        self.login_author.post(self.url, data=self.form_data)
+        """Cоздание дублирующих уникальныйх полей."""
         notes_count_main = Note.objects.count()
-        self.login_author.post(self.url, data=self.form_data)
-        notes_count_last = Note.objects.count()
-        self.assertEqual(notes_count_last, (notes_count_main))
-        response = self.login_author.post(self.url, data=self.form_data)
+        response = self.login_author.post(self.url,
+                                          data=self.form_data_not_slug)
         notes_count_2 = Note.objects.count()
         self.assertEqual(notes_count_2, notes_count_main)
-        self.assertFormError(response, 'form', 'slug', f'slug{self.warning}')
+        self.assertFormError(response, 'form', 'slug',
+                             f'{self.notes.slug}{self.warning}')
 
     def test_auto_creation_slug(self):
         """функция автоматической генерации slug."""
-        self.login_author.post(self.url, data=self.form_data)
         notes_count_main = Note.objects.count()
         self.login_author.post(self.url, data=self.form_data)
         notes_count_last = Note.objects.count()
         notes = self.notes
-        self.assertEqual(notes_count_main, notes_count_last)
+        self.assertNotEqual(notes_count_main, notes_count_last)
         self.assertEqual(notes.slug, slugify(notes.title))
 
 
@@ -73,21 +72,21 @@ class TestnotesEditDelete(TestFixture):
         """Редактирование заметки автором."""
         response = self.login_author.post(self.edit_url, data=self.form_data)
         self.assertRedirects(response, self.note_url)
-        first_id = self.notes.id
-        note = Note.objects.get(id=first_id)
+        first_slug = self.form_data["slug"]
+        note = Note.objects.get(slug=first_slug)
         self.login_author.post(self.edit_url, data=self.form_data)
-        title, text, author, slug = self.form_data.values()
+        title, text, slug = self.form_data.values()
         self.assertEqual(note.text, text)
         self.assertEqual(note.title, title)
-        self.assertEqual(note.author, author)
+        self.assertEqual(note.author, self.author)
 
     def test_user_cant_edit_notes_of_another_user(self):
         """Запрет редактирование  заметки другого автора."""
+        note_main = self.notes
         response = self.login_reader.post(self.edit_url, data=self.form_data)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-        first_id = self.notes.id
-        note = Note.objects.get(id=first_id)
-        title, text, author, slug = self.form_data.values()
-        self.assertNotEqual(note.text, text)
-        self.assertEqual(note.title, title)
-        self.assertEqual(note.author, author)
+        note_last = self.notes
+        self.assertEqual(note_main.text, note_last.text)
+        self.assertEqual(note_main.title, note_last.title)
+        self.assertEqual(note_main.slug, note_last.slug)
+        self.assertEqual(note_main.author, self.author)

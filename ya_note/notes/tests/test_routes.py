@@ -15,9 +15,8 @@ class TestRoutes(TestFixture):
         urls = (
             self.home, self.login, self.logout, self.signup
         )
-        for name, args in urls:
-            with self.subTest(name=name):
-                url = reverse(name, args=args)
+        for url in urls:
+            with self.subTest(url=url):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
@@ -26,24 +25,23 @@ class TestRoutes(TestFixture):
         urls = (
             self.list, self.success, self.add,
         )
-        for name, args in urls:
-            with self.subTest(name=name):
-                url = reverse(name, args=args)
+        for url in urls:
+            with self.subTest(url=url):
                 response = self.login_author.get(url)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_redirect_anonymous_client(self):
         """Проверка перенаправление незалогиненного пользователя."""
-        login_url = reverse('users:login')
+        
         urls = (
-            self.edit, self.delete, ('notes:detail', (self.notes.slug,)),
+            self.edit, self.delete, self.detail,
             self.list, self.success,
             self.add
         )
         for name, args in urls:
             with self.subTest(name=name):
                 url = reverse(name, args=args)
-                redirect_url = f'{login_url}?next={url}'
+                redirect_url = f'{self.login}?next={url}'
                 response = self.client.get(url)
                 self.assertRedirects(response, redirect_url)
 

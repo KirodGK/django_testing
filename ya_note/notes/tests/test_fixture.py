@@ -1,11 +1,12 @@
 from django.contrib.auth import get_user_model
+
 from django.urls import reverse
 
 from django.test import Client, TestCase
 
 from notes.models import Note
 
-from .const import WARNING
+from ..forms import WARNING
 
 User = get_user_model()
 
@@ -42,46 +43,44 @@ class TestFixture(TestCase):
         cls.form_data = {
             'title': 'Заголовок',
             'text': 'Текст1',
-            'author': cls.author,
             'slug': 'slug'
         }
-        cls.form_data_not = {
+        cls.form_data_not_slug = {
             'title': 'Заголовок',
             'text': 'Текст1',
-            'author': cls.author,
-            'slug': 'slug1'
+            'slug': ''
         }
-        cls.edit = (
+        cls.edit = reverse(
             'notes:edit', (cls.notes.slug,)
         )
-        cls.add = (
+        cls.add = reverse(
             'notes:add', None
         )
-        cls.delete = (
+        cls.delete = reverse(
             'notes:delete', (cls.notes.slug,)
         )
-        cls.detail = (
+        cls.detail = reverse(
             'notes:detail', (cls.notes.slug,)
         )
-        cls.list = (
+        cls.list = reverse(
             'notes:list', None
         )
-        cls.success = (
+        cls.success = reverse(
             'notes:success', None
         )
-        cls.home = (
+        cls.home = reverse(
             'notes:home', None
         )
-        cls.login = (
+        cls.login = reverse(
             'users:login', None
         )
-        cls.logout = (
+        cls.logout = reverse(
             'users:logout', None
         )
-        cls.signup = (
+        cls.signup = reverse(
             'users:signup', None
         )
-
+        cls.list_reverse = reverse('notes:list', args=None)
         cls.url = reverse('notes:add', args=None)
         cls.note_url = reverse('notes:success', args=None)
         cls.edit_url = reverse('notes:edit', args=(cls.notes.slug,))
