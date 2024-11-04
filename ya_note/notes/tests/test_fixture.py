@@ -84,5 +84,5 @@ class TestFixture(TestCase):
         cls.note_url = reverse('notes:success', args=None)
         cls.edit_url = reverse('notes:edit', args=(cls.notes.slug,))
         cls.delete_url = reverse('notes:delete', args=(cls.notes.slug,))
-        cls.warning = ' - такой slug уже существует, придумайте уникальное\
-            значение!'
+        cls.warning = """ - такой slug уже существует, придумайте уникальное
+            значение!"""
