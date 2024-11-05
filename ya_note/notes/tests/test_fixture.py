@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 
 from django.urls import reverse
 from django.test import Client, TestCase
+
 from notes.models import Note
 from ..forms import WARNING
 
@@ -48,32 +49,30 @@ class TestFixture(TestCase):
             'slug': ''
         }
         cls.add = reverse(
-            'notes:add', None
+            'notes:add'
         )
         cls.detail = reverse(
             'notes:detail', args=(cls.notes.slug,)
         )
         cls.list = reverse(
-            'notes:list', None
+            'notes:list'
         )
         cls.success = reverse(
-            'notes:success', None
+            'notes:success'
         )
         cls.home = reverse(
-            'notes:home', None
+            'notes:home'
         )
         cls.login = reverse(
-            'users:login', None
+            'users:login'
         )
         cls.logout = reverse(
-            'users:logout', None
+            'users:logout'
         )
         cls.signup = reverse(
-            'users:signup', None
+            'users:signup'
         )
-        cls.list_reverse = reverse('notes:list', args=None)
-        cls.url = reverse('notes:add', args=None)
-        cls.note_url = reverse('notes:success', args=None)
+        cls.url = reverse('notes:add')
         cls.edit_url = reverse('notes:edit', args=(cls.notes.slug,))
         cls.delete_url = reverse('notes:delete', args=(cls.notes.slug,))
         cls.warning = WARNING

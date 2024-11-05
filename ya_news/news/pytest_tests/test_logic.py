@@ -10,12 +10,14 @@ from .const import FORM_DATA
 def test_user_create_comment(author_client, detail, author, news,
                              comment):
     """Создание комментария авторизованный автором."""
-    comments_count = Comment.objects.count()
+    comments = Comment.objects.all()
+    comments.delete()
     url = detail
+    comments_count = comments.count()
     response = author_client.post(url, data=FORM_DATA)
     assertRedirects(response, f'{url}#comments')
     assert Comment.objects.count() == comments_count + 1
-    new_comment = Comment.objects.last()
+    new_comment = Comment.objects.get()
     assert new_comment.text == FORM_DATA['text']
     assert new_comment.author == author
     assert new_comment.news == news
@@ -56,7 +58,7 @@ def test_author_edit_comment(author_client, author, edit, detail_comment,
     response = author_client.post(edit, data=FORM_DATA)
     new_comment = Comment.objects.get(id=comment.id)
     assert Comment.objects.count() == comments_count
-    assert new_comment.text != comment.text
+    assert new_comment.text == FORM_DATA['text']
     assert new_comment.author == comment.author
     assert new_comment.news == comment.news
     assertRedirects(response, detail_comment)

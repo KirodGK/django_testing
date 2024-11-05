@@ -1,10 +1,6 @@
-from django.contrib.auth import get_user_model
-
 from notes.models import Note
 from .test_fixture import TestFixture
 from ..forms import NoteForm
-
-User = get_user_model()
 
 
 class TestNotesPage(TestFixture):
@@ -12,9 +8,9 @@ class TestNotesPage(TestFixture):
     def test_notes_list(self):
         """Наличие заметок в спике вывода."""
         response = self.login_author.get(self.list)
-        object_list_main = response.context['object_list']
+        object_main = response.context['object_list']
         note_author = Note.objects.filter(author=self.author).first()
-        self.assertIn(note_author, object_list_main)
+        self.assertIn(note_author, object_main)
 
     def test_reader_context_list(self):
         """Наличие заметок другого автора."""
