@@ -1,9 +1,12 @@
-import pytest
-from datetime import timedelta
+from datetime import datetime, timedelta
 
-from news.models import News, Comment
 from django.conf import settings
+from django.urls import reverse
 from django.utils import timezone
+from django.test import Client
+import pytest
+
+from news.models import Comment, News
 
 
 @pytest.fixture
@@ -13,21 +16,23 @@ def reader(django_user_model):
 
 
 @pytest.fixture
-def reader_client(reader, client):
+def reader_client(reader):
     """Фикстура авторизованного Читателя."""
+    client = Client()
     client.force_login(reader)
     return client
 
 
 @pytest.fixture
 def author(django_user_model):
-    """Фикстура Автора"""
+    """Фикстура Автора."""
     return django_user_model.objects.create(username='Автор')
 
 
 @pytest.fixture
-def author_client(author, client):
+def author_client(author):
     """Фикстура авторизованного Автора."""
+    client = Client()
     client.force_login(author)
     return client
 
@@ -43,13 +48,12 @@ def news(author):
 
 
 @pytest.fixture
-def news_10(author):
+def news_list_generate(author):
     """Фикстура создание записей больше чем паддинг."""
-    all_news = []
+    today = datetime.today()
     for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1):
-        news = News(title=f'Новость {index}', text='Просто текст.')
-        all_news.append(news)
-    return News.objects.bulk_create(all_news)
+        News.objects.create(title=f'Новость {index}', text='Просто текст.',
+                            date=today - timedelta(days=index))
 
 
 @pytest.fixture
@@ -66,7 +70,6 @@ def comment(author, news):
 @pytest.fixture
 def commets(author, news):
     """Фикстура создания нескольких комментариев."""
-    all_comments = []
     for index in range(2):
         comment = Comment.objects.create(
             news=news,
@@ -75,25 +78,51 @@ def commets(author, news):
         )
         comment.created = timezone.now() + timedelta(days=index)
         comment.save()
-        all_comments.append(comment)
-    return all_comments
 
 
 @pytest.fixture
-def id_news_for_args(news):
-    """Фикстура номера записи."""
-    return news.id,
+def home():
+    """Фикстура url home."""
+    return reverse('news:home')
 
 
 @pytest.fixture
-def id_comment_for_args(comment):
-    """Фикстура номера комментария."""
-    return comment.id,
+def login():
+    """Фикстура url login."""
+    return reverse('users:login')
 
 
 @pytest.fixture
-def form_data():
-    """Фикстура текста."""
-    return {
-        'text': 'Новый техт'
-    }
+def logout():
+    """Фикстура url logout."""
+    return reverse('users:logout')
+
+
+@pytest.fixture
+def signup():
+    """Фикстура url signup."""
+    return reverse('users:signup')
+
+
+@pytest.fixture
+def detail(news):
+    """Фикстура url detail."""
+    return reverse('news:detail', args=[news.id])
+
+
+@pytest.fixture
+def detail_comment(detail):
+    """Фикстура url detail_comment."""
+    return detail + '#comments'
+
+
+@pytest.fixture
+def delete(comment):
+    """Фикстура url delete."""
+    return reverse('news:delete', args=[comment.id])
+
+
+@pytest.fixture
+def edit(comment):
+    """Фикстура url edit."""
+    return reverse('news:edit', args=[comment.id])

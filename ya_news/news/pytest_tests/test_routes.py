@@ -1,70 +1,41 @@
 import pytest
-from http import HTTPStatus
-
-from django.urls import reverse
 from pytest_django.asserts import assertRedirects
+from pytest_lazyfixture import lazy_fixture as lf
+
+from .const import NOT_FOUND, SUCCESSFULLY_COMPLETED
 
 
 @pytest.mark.parametrize(
-    'name, args',
+    'reverse_url, parametrized_client, status',
     (
-        ('news:home', None),
-        ('users:login', None),
-        ('users:logout', None),
-        ('users:signup', None),
-        ('news:detail', pytest.lazy_fixture('id_news_for_args')),
-    ),
+        (lf('delete'), lf('author_client'), SUCCESSFULLY_COMPLETED),
+        (lf('edit'), lf('author_client'), SUCCESSFULLY_COMPLETED),
+        (lf('delete'), lf('admin_client'), NOT_FOUND),
+        (lf('edit'), lf('admin_client'), NOT_FOUND),
+        (lf('home'), lf('admin_client'), SUCCESSFULLY_COMPLETED),
+        (lf('login'), lf('admin_client'), SUCCESSFULLY_COMPLETED),
+        (lf('logout'), lf('admin_client'), SUCCESSFULLY_COMPLETED),
+        (lf('signup'), lf('admin_client'), SUCCESSFULLY_COMPLETED),
+        (lf('detail'), lf('admin_client'), SUCCESSFULLY_COMPLETED),
+    )
 )
-def test_pages_availability_anonymous_user(client, name, args, news):
-    """Доступность страниц для пользователя."""
-    url = reverse(name, args=args)
-    response = client.get(url)
-    assert response.status_code == HTTPStatus.OK
-
-
-@pytest.mark.parametrize(
-    'name',
-    ('news:delete', 'news:edit'),
-)
-def test_pages_availability_author(author_client, name, comment):
-    """Доступность страниц удаления и редактирования  для автора."""
-    url = reverse(name, args=(comment.id,))
-    response = author_client.get(url)
-    assert response.status_code == HTTPStatus.OK
-
-
-@pytest.mark.parametrize(
-    'parametrized_client, expected_status',
-    (
-        (pytest.lazy_fixture('admin_client'), HTTPStatus.NOT_FOUND),
-        (pytest.lazy_fixture('author_client'), HTTPStatus.OK)
-    ),
-)
-@pytest.mark.parametrize(
-    'name',
-    ('news:delete', 'news:edit'),
-)
-def test_pages_availability_different_users(
-        parametrized_client, name, comment, expected_status
-):
-    """Доступность страниц удаления и редактирования для пользователей."""
-    url = reverse(name, args=(comment.id,))
+def test_redirects_all(reverse_url, parametrized_client, status):
+    """Доступность страниц удаления и редактирования."""
+    url = reverse_url
     response = parametrized_client.get(url)
-    assert response.status_code == expected_status
+    assert response.status_code == status
 
 
 @pytest.mark.parametrize(
-    'name, args',
+    'urls',
     (
-        ('news:delete', pytest.lazy_fixture('id_comment_for_args')),
-        ('news:edit', pytest.lazy_fixture('id_comment_for_args')),
+        lf('delete'),
+        lf('edit'),
     ),
 )
-def test_redirects(client, name, args):
+def test_redirects(client, urls, login):
     """Перенаправлние при запросе страниц удаления и редактирования записей\
         другого автора."""
-    login_url = reverse('users:login')
-    url = reverse(name, args=args)
-    expected_url = f'{login_url}?next={url}'
-    response = client.get(url)
+    expected_url = f'{login}?next={urls}'
+    response = client.get(urls)
     assertRedirects(response, expected_url)
