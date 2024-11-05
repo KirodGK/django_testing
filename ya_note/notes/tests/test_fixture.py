@@ -1,10 +1,14 @@
 from django.contrib.auth import get_user_model
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1ec109f3bbda96288489efa7e8c009d05d269302
 from django.urls import reverse
 
 from django.test import Client, TestCase
 
 from notes.models import Note
+from ..forms import WARNING
 
 from ..forms import WARNING
 
@@ -50,11 +54,25 @@ class TestFixture(TestCase):
             'text': 'Текст1',
             'slug': ''
         }
+<<<<<<< HEAD
         cls.add = reverse(
             'notes:add', None
         )
         cls.detail = reverse(
             'notes:detail', args=(cls.notes.slug,)
+=======
+        cls.edit = reverse(
+            'notes:edit', (cls.notes.slug,)
+        )
+        cls.add = reverse(
+            'notes:add', None
+        )
+        cls.delete = reverse(
+            'notes:delete', (cls.notes.slug,)
+        )
+        cls.detail = reverse(
+            'notes:detail', (cls.notes.slug,)
+>>>>>>> 1ec109f3bbda96288489efa7e8c009d05d269302
         )
         cls.list = reverse(
             'notes:list', None
